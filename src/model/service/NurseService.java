@@ -26,72 +26,7 @@ public class NurseService implements IService<NurseBean> {
 	private static SessionFactory sessionFactory ;
  
 	
-	public static void main(String[] args) {
-		ApplicationContext context =
-				new ClassPathXmlApplicationContext("beans.config.xml");
-		sessionFactory = (SessionFactory) context.getBean("sessionFactory");
- 		dao = new NurseBeanDAO(sessionFactory);
-		service = new NurseService(dao);
- 		dao = new NurseBeanDAO(sessionFactory);
-		service = new NurseService(dao);
-		insertNurseTest();
-		insertNurseOper();
-		selectTest();
-  	}
-
-	private static void insertNurseTest() {
-		try {
-			trx = sessionFactory.getCurrentSession().beginTransaction();
-			Date current = new Date();
-			NurseBean bean = new NurseBean("C1802","護士丙丙", current);
-			bean.setId(0);
-   			NurseBean insert = service.insert(bean);
- 			trx.commit();
-		} catch (Exception e) {
-			System.out.println("e Test"+e.getMessage());
-			for (StackTraceElement s :e.getStackTrace())
-				System.out.print(s.toString());
-			trx.rollback();
-		}
-		
-	}
-	
-	
-	private static void insertNurseOper()
-	{
-		try {
-			trx = sessionFactory.getCurrentSession().beginTransaction();
-			Date current = new Date();
-			NurseBean nurseBean = new NurseBean("N02","護士乙", current);
-			nurseBean.setId(4);
-			OperBean operBean = new OperBean("工作4", current);
-			operBean.setOperId(5);
-			NurseBean insert = service.insert(nurseBean,operBean);
- 			trx.commit();
-		} catch (Exception e) {
-			System.out.println("e Test"+e.getMessage());
-			for (StackTraceElement s :e.getStackTrace())
-				System.out.println(s.toString());
-			trx.rollback();
-		}
-		
-
-	}
-
-	private static void selectTest() {
-		try {
-			trx = sessionFactory.getCurrentSession().beginTransaction();
-  			List<NurseBean> select = service.select();
-			System.out.println("select" + select);
-			trx.commit();
-		} catch (Exception e) {
-			System.out.println("e Test"+e.getMessage());
-			for (StackTraceElement s :e.getStackTrace())
-				System.out.print(s.toString());
-			trx.rollback();
-		}
-	}
-
+ 
 	public NurseService(NurseBeanDAO dao) {
 		this.dao = dao;
 	}
