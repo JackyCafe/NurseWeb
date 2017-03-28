@@ -10,23 +10,29 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
- 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import model.NurseBean;
 import model.OperBean;
 import model.Interface.IService;
 import model.dao.NurseBeanDAO;
-import model.misc.HibernateUtil;
-
+import model.dao.OperBeanDAO;
+ 
 public class NurseService implements IService<NurseBean> {
 	private static NurseService service;
 	private static NurseBeanDAO dao;
 	private static Transaction trx;
-	private static SessionFactory factory ;
+	private static SessionFactory sessionFactory ;
  
 	
 	public static void main(String[] args) {
-		factory = HibernateUtil.getSessionFactory();
-		dao = new NurseBeanDAO(factory);
+		ApplicationContext context =
+				new ClassPathXmlApplicationContext("beans.config.xml");
+		sessionFactory = (SessionFactory) context.getBean("sessionFactory");
+ 		dao = new NurseBeanDAO(sessionFactory);
+		service = new NurseService(dao);
+ 		dao = new NurseBeanDAO(sessionFactory);
 		service = new NurseService(dao);
 		insertNurseTest();
 		insertNurseOper();
@@ -35,7 +41,7 @@ public class NurseService implements IService<NurseBean> {
 
 	private static void insertNurseTest() {
 		try {
-			trx = factory.getCurrentSession().beginTransaction();
+			trx = sessionFactory.getCurrentSession().beginTransaction();
 			Date current = new Date();
 			NurseBean bean = new NurseBean("C1802","護士丙丙", current);
 			bean.setId(0);
@@ -54,7 +60,7 @@ public class NurseService implements IService<NurseBean> {
 	private static void insertNurseOper()
 	{
 		try {
-			trx = factory.getCurrentSession().beginTransaction();
+			trx = sessionFactory.getCurrentSession().beginTransaction();
 			Date current = new Date();
 			NurseBean nurseBean = new NurseBean("N02","護士乙", current);
 			nurseBean.setId(4);
@@ -74,7 +80,7 @@ public class NurseService implements IService<NurseBean> {
 
 	private static void selectTest() {
 		try {
-			trx = factory.getCurrentSession().beginTransaction();
+			trx = sessionFactory.getCurrentSession().beginTransaction();
   			List<NurseBean> select = service.select();
 			System.out.println("select" + select);
 			trx.commit();
@@ -128,7 +134,7 @@ public class NurseService implements IService<NurseBean> {
 
 	@Override
 	public Session getSession() {
-		return HibernateUtil.getSessionFactory().getCurrentSession();
+		return sessionFactory.getCurrentSession();
 	}
 
 	@Override

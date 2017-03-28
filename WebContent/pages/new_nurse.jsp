@@ -1,9 +1,13 @@
 <%@page import="model.service.OperService"%>
 <%@page import="model.dao.OperBeanDAO"%>
-<%@page import="model.misc.HibernateUtil"%>
-<%@page import="org.hibernate.SessionFactory"%>
+ <%@page import="org.hibernate.SessionFactory"%>
 <%@page import="model.dao.NurseBeanDAO"%>
 <%@page import="model.service.NurseService"%>
+<%@page import="javax.servlet.ServletContext"%>
+<%@page import=" org.springframework.context.ApplicationContext"%>
+<%@page import=" org.springframework.web.context.WebApplicationContext"%>
+<%@page import=" org.springframework.web.context.support.WebApplicationContextUtils"%>
+
 <%@page import="java.util.*"%>
 <%@page import="model.*"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -98,9 +102,11 @@
 </head>
 <body>
 	<%
-		SessionFactory factory = HibernateUtil.getSessionFactory();
-		NurseService nurseService = new NurseService(new NurseBeanDAO(factory));
-		OperService operService = new OperService(new OperBeanDAO(factory));
+		ServletContext app = this.getServletContext();
+		ApplicationContext context =
+			WebApplicationContextUtils.getWebApplicationContext(app);
+ 		NurseService nurseService = (NurseService) context.getBean("nurseService");
+		OperService operService = (OperService) context.getBean("operService");
 		List<OperBean> opers = operService.select();
 		request.setAttribute("opers", opers);
 	%>

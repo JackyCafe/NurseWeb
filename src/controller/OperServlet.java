@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,14 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hibernate.SessionFactory;
-
-import model.NurseBean;
-import model.OperBean;
-import model.dao.NurseBeanDAO;
-import model.dao.OperBeanDAO;
-import model.misc.HibernateUtil;
-import model.service.NurseService;
-import model.service.OperService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+ import model.OperBean;
+ import model.dao.OperBeanDAO;
+ import model.service.OperService;
 
 /**
  * Servlet implementation class NurseServlet
@@ -27,17 +26,32 @@ import model.service.OperService;
 public class OperServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	OperService operService;
+	OperBeanDAO dao;
 	String command;
+	SessionFactory sessionFactory;
 
 	public OperServlet() {
 		super();
 	}
 
+	@Override
+	public void init() throws ServletException {
+
+		ServletContext application = this.getServletContext();
+		ApplicationContext context =
+				WebApplicationContextUtils.getWebApplicationContext(application);
+		 if(context ==null)
+			 System.out.println("null");
+		 else
+			 System.out.println("ok");
+
+		 operService = (OperService) context.getBean("operService");
+		
+ 	}
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		command = request.getParameter("oper_action");
-		operService = new OperService(new OperBeanDAO(HibernateUtil.getSessionFactory()));
-
+	
 		if (command.equals("list")) {
 			List<OperBean> select = operService.select();
 			request.setAttribute("select", select);
@@ -66,10 +80,7 @@ public class OperServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		String name = null, nurseId = null;
 		String command;
-
-		operService = new OperService(new OperBeanDAO(HibernateUtil.getSessionFactory()));
-
-		name = request.getParameter("oper_name");
+ 		name = request.getParameter("oper_name");
 		Date updateTime = new Date();
 		OperBean bean = new OperBean(name, updateTime);
 		bean.setOperId(0);
@@ -77,6 +88,7 @@ public class OperServlet extends HttpServlet {
 		System.out.println("action" + command);
 		try {
 			if (command.equals("Insert")) {
+				System.out.println("insert"+bean);
 				OperBean insert = operService.insert(bean);
 				if (insert != null) {
 					request.setAttribute("select", insert);
